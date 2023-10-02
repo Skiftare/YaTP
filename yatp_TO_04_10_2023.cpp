@@ -64,40 +64,27 @@ int calc_days(int d, int m, int y) {
     {
     case 12:
         q += 30;
-        
-        //q += 31;
     case 11:
-        //q += 30;
         q += 31;
     case 10:
-        //q += 31;
         q += 30;
     case 9:
-        //q += 30;
         q += 31;
     case 8:
-        //q += 31;
         q += 31;
     case 7:
-        //q += 31
         q += 30;;
     case 6:
-        //q += 30;
         q += 31;
     case 5:
-        //q += 31;
         q += 30;
     case 4:
-        //q += 30;
         q += 31;
     case 3:
-        //q += 31;
         q += 28 + (y % 4 == 0);
     case 2:
-       // q += 28 + (y % 4 == 0);
         q += 31;
     case 1:
-       // q += 31;
         q += d;
     }
     cout << q << endl;
