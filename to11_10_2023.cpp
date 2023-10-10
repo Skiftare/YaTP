@@ -47,8 +47,20 @@ bool third_task(int a, int b) {
     }
     return (sum1 == b && sum2 == a);
 }
-int fouth_task() {
-    return 25;
+int fouthTask(int countOfFishermen) {
+    //return -2;
+    int fishs = 1;
+    while (1) {
+        bool f = false;
+        int c = fishs;
+        for (int i = 0; i < countOfFishermen and !f; i++) {
+            f = (c % 3 != 1);
+            if (((c - 1) / 3) <= 0) f = true;
+            c = (c - 1) - ((c - 1) / 3);
+        }
+        if (f == false) return fishs;
+        fishs++;
+    }
 }
 
 signed solve() {
