@@ -111,21 +111,38 @@ signed hw18_1(int n) {
     }
     return 0;
 }
-signed hw18_2(int n) {
-    int buf = n;
-    vector<int> mas(10);
-    while (buf) {
-        mas[buf % 10]++;
-        buf /= 10;
-    }
-    buf = 0;
-    for (int i = 9; i >= 0; i--) {
-        while (mas[i]) {
-            buf = buf * 10 + i;
-            mas[i]--;
+long long hw18_2(int n) {
+    int res = 0;
+    int maxiNum, maxiPos, buf, l;
+    int length_of_n = 0;
+    for(buf = n;buf>0;buf/=10, length_of_n++);
+    while(n){
+        for(buf = n, l = 0, maxiNum = -1, maxiPos = -1;buf>0;buf/=10, l++){
+            if(buf%10 > maxiNum){
+                maxiNum = buf%10;
+                maxiPos = l;
+            }
         }
+        for(buf = n, l = 0;buf>0;buf/=10, l++) {
+            if(l == maxiPos) {
+                res = res * 10 + buf%10;
+                break;
+            }
+        }
+        for(buf = 0, l = 0;n>0;n/=10, l++){
+            if(l != maxiPos){
+                buf = buf*10+(n%10);
+            }
+        }
+        n = buf;
     }
-    return buf;
+    int lengh_of_res = 0;
+    for(buf = res;buf>0;buf/=10, lengh_of_res++);
+    while(lengh_of_res<length_of_n){
+        res*=10;
+        lengh_of_res++;
+    }
+    return res;
 }
 int hw18_3(int p) {
     int l = 1;
