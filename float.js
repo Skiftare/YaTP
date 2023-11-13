@@ -325,7 +325,6 @@ function sumFloats(float1, float2){
 }
 WSH.echo("standart tests:")
 q = (sumFloats(createFloat(-146.34), createFloat(4.25)))
-
 WSH.echo("-146.34 + 4.25 = ",parseFloat(q))
 q = (sumFloats(createFloat(146.34), createFloat(4.25)))
 WSH.echo("146.34 + 4.25 = ",parseFloat(q))
