@@ -10,18 +10,17 @@ function count(ss, needToCnt){
 function createFloat(aa){
     a = aa;
     ans = [];
-    for(i = 0;i<23;i++){
+    for(i = 0;i<32;i++){
         ans[i] = 0;
     }
     if(typeof(a) != "number"){
-        WSH.echo("income isnt number")
         for(i = 0;i<8;i++){
             ans[i+1] = 1;
         }
         ans[20] = 1;
+        return ans;
     }
     if(isNaN(a)){
-        WSH.echo("income is +- NaN")
         if(a<0){
             ans[0] = 1;
         }
@@ -31,7 +30,6 @@ function createFloat(aa){
         ans[20] = 1;
     }
     if(a == Infinity){
-        WSH.echo("income is +inf")
         for(i = 0;i<8;i++){
             ans[i+1] = 1;
         }
@@ -39,7 +37,6 @@ function createFloat(aa){
     }
     if(a == -Infinity){
         ans[0] = 1;
-        WSH.echo("income is -inf")
         for(i = 0;i<8;i++){
             ans[i+1] = 1;
         }
@@ -51,6 +48,9 @@ function createFloat(aa){
     }
     else if(a>0){
         ans[0] = 0;
+    }
+    else{
+        return ans;
     }
     integerPart = Number(String(a).split('.')[0])
     floatPart = Number('0.' + String(a).split('.')[1])
@@ -75,6 +75,7 @@ function createFloat(aa){
         }
     }
     else{
+        bitsOfFloatPart = "";
         flag = false;
         while(floatPart > 0 && bitsOfFloatPart.length < 24){
             floatPart *= 2;
@@ -97,6 +98,9 @@ function createFloat(aa){
     p+=127;
     if(p <= 0 || p>= 255){
         if(p<= 0){
+            for(i = 0;i<8;i++){
+                ans[i+1] = 0
+            }
             return ans;
         }
         for(i = 0;i<8;i++){
@@ -117,10 +121,36 @@ function createFloat(aa){
     return ans; 
 }
 function parseFloat(mas){
-    sign = Math.pow(-1, mas[0]);
+    sign = mas[0]
     p = 0;
     for(i = 0;i<8;i++){
         p = p + mas[i+1]*(Math.pow(2, 7-i));
+    }
+    if(p == 0 || p == 255){
+        mantiss = 1;
+        for(i = 0;i<23;i++){
+            
+            mantiss+=mas[i+9];
+        }
+        if(mantiss == 1 && p == 255 && sign == 0){
+            return "+inf";
+        }
+        if(mantiss == 1 && p == 255 && sign == 1){
+            return "-inf";
+        }
+        if(mantiss > 1 && p == 255 && sign == 0){
+            return "+NaN";
+        }
+        if(mantiss > 1 && p == 255 && sign == 1){
+            return "-NaN";
+        }
+        if(mantiss == 1 && p == 0){
+            return 0;
+        }
+    }
+    sign = sign+1;
+    if(sign == 2){
+        sign = -1;
     }
     p-=127;
     mantiss = 1;
@@ -149,12 +179,14 @@ function sumFloats(float1, float2){
     if(count(mantissa1,'1') == 1 && exponent1 == 255){
         if(count(mantissa2,'1') == 1 && exponent2 == 255 && sign1 != sign2){
             float1[20] = 1;
+            float1[0] = 0;
         }
         return float1;
     }
     if(count(mantissa2,'1') == 1 && exponent2 == 255){
         if(count(mantissa1,'1') == 1 && exponent1 == 255 && sign1 != sign2){
             float2[20] = 1;
+            float2[0] = 0;zzzzz
         }
         return float2;
     }
@@ -172,7 +204,6 @@ function sumFloats(float1, float2){
             while(exponent1 != exponent2){
                 exponent2++;
                 mantissa2 = '0' + mantissa2
-                
             }
         }
         for(i = 0;i<24;i++){
@@ -204,7 +235,6 @@ function sumFloats(float1, float2){
         if(mind == -1){
             resultMantiss = '1'+resultMantiss;
             result[0] = 1;
-            
         }
         clearMantiss = "";
         flag = false;
@@ -236,7 +266,6 @@ function sumFloats(float1, float2){
     }
     else{
         flag = true;
-        //Выравниваем степени
         if(exponent1 < exponent2){
             while(exponent1 != exponent2){
                 exponent1++;
@@ -280,7 +309,6 @@ function sumFloats(float1, float2){
         while(clearMantiss.length<24){
             clearMantiss = clearMantiss+'0';
         }
-        
         bitsOfExponent = (exponent1 >>> 0).toString(2);
         result[0] = sign1;
         while(bitsOfExponent.length < 8){
@@ -293,10 +321,47 @@ function sumFloats(float1, float2){
             result[i+9] = clearMantiss.charCodeAt(i) - 48;
         }
         return result;
-        
     }
 }
+WSH.echo("standart tests:")
 q = (sumFloats(createFloat(-146.34), createFloat(4.25)))
-WSH.echo(parseFloat(q))
-WSH.echo(q)
-WSH.echo(createFloat(-142.09))
+
+WSH.echo("-146.34 + 4.25 = ",parseFloat(q))
+q = (sumFloats(createFloat(146.34), createFloat(4.25)))
+WSH.echo("146.34 + 4.25 = ",parseFloat(q))
+q = (sumFloats(createFloat(146.34), createFloat(-4.25)))
+WSH.echo("146.34 + (-4.25) = ",parseFloat(q))
+q = (sumFloats(createFloat(-146.34), createFloat(-4.25)))
+WSH.echo("-146.34 + (-4.25) = ",parseFloat(q))
+WSH.echo();
+WSH.echo("zero test:")
+q = (sumFloats(createFloat(-146.34), createFloat(0)))
+WSH.echo("-146.34 + 0 = ",parseFloat(q))
+q = (sumFloats(createFloat(0), createFloat(0)))
+WSH.echo("0 + 0 = ",parseFloat(q))
+WSH.echo();
+WSH.echo("NaN test:")
+q = (sumFloats(createFloat("qw"), createFloat(34.224)))
+WSH.echo("qw + 34.224 = ",parseFloat(q))
+q = (sumFloats(createFloat("qw"), createFloat(0)))
+WSH.echo("qw + 0 = ",parseFloat(q))
+q = (sumFloats(createFloat("qw"), createFloat("2344444444444")))
+WSH.echo("qw + '2344444444444' = ",parseFloat(q))
+WSH.echo();
+WSH.echo("inf test:")
+q = sumFloats(createFloat(1/0), createFloat(-1/0))
+WSH.echo("1/0 + -1/0 = ",parseFloat(q))
+q = sumFloats(createFloat(1/0), createFloat("qw"))
+WSH.echo("1/0 + qw = ",parseFloat(q))
+q = sumFloats(createFloat(1/0), createFloat(13))
+WSH.echo("1/0 + 13 = ",parseFloat(q))
+q = sumFloats(createFloat(1/0), createFloat(0))
+WSH.echo("1/0 + 0 = ",parseFloat(q))
+q = sumFloats(createFloat(-1/0), createFloat(1/0))
+WSH.echo("-1/0 + -1/0 = ",parseFloat(q))
+q = sumFloats(createFloat(-1/0), createFloat("qw"))
+WSH.echo("-1/0 + qw = ",parseFloat(q))
+q = sumFloats(createFloat(-1/0), createFloat(13))
+WSH.echo("-1/0 + 13 = ",parseFloat(q))
+q = sumFloats(createFloat(-1/0), createFloat(0))
+WSH.echo("-1/0 + 0 = ",parseFloat(q))
